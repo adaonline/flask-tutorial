@@ -32,5 +32,17 @@ def create_app(test_config=None):
 
     from . import db
     db.init_app(app)
+
+    # 使用 app.register_blueprint() 导入并注册 蓝图。新的代码放在工厂函数的尾部返回应用之前。
+    from . import auth
+    app.register_blueprint(auth.bp)
+
+
+    # 博客蓝图没有 url_prefix 。因此 index 视图会用于 / ， create 会用于 /create ，以此类推。博客是 Flaskr 的主要 功能，因此把博客索引作为主索引是合理的
+    # 我们使用 app.add_url_rule() 关联端点名称 'index' 和 / URL ，这样 url_for('index') 或 url_for('blog.index') 都会有效，会生成同样的 / URL 。
+    from . import blog
+    app.register_blueprint(blog.bp) 
+    app.add_url_rule('/', endpoint='index')
+
     return app
 
