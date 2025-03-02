@@ -15,3 +15,28 @@ CREATE TABLE post (
   body TEXT NOT NULL,
   FOREIGN KEY (author_id) REFERENCES user (id)
 );
+
+
+create TABLE comment(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    post_id INTEGER NOT NULL, 
+    comment_text TEXT NOT NULL,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 记录评论创建时间
+    FOREIGN KEY (user_id) REFERENCES user (id),
+    FOREIGN KEY (post_id) REFERENCES post (id)
+)
+
+
+CREATE TABLE tag (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT UNIQUE NOT NULL
+);
+
+CREATE TABLE post_tag (
+  post_id INTEGER NOT NULL,
+  tag_id INTEGER NOT NULL,
+  PRIMARY KEY (post_id, tag_id),
+  FOREIGN KEY (post_id) REFERENCES post (id),
+  FOREIGN KEY (tag_id) REFERENCES tag (id)
+);

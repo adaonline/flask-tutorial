@@ -23,7 +23,11 @@ def init_db():
     db = get_db()
     with current_app.open_resource('schema.sql') as f:
         db.executescript(f.read().decode('utf8'))
-        
+
+def update_db():
+    db = get_db()
+    with current_app.open_resource('update.sql') as f:
+        db.executescript(f.read().decode('utf8'))     
 # click.command() 定义一个名为 init-db 命令行，它调用 init_db 函数，并为用户显示一个成功的消息。更多关于如何写命令行的 内容请参阅 doc:/cli 。
 @click.command('init-db')
 def init_db_command():

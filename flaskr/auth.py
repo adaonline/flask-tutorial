@@ -4,7 +4,7 @@ from flask import Blueprint, flash, g, redirect, render_template, request, sessi
 
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from flaskr.db import get_db
+from flaskr.models.user import *
 
 '''
 这里创建了一个名称为 'auth' 的 Blueprint 。和应用对象一样， 
@@ -19,7 +19,7 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        db = get_db()
+        
         error = None
         if not username:
             error = 'Username is required.'
@@ -28,13 +28,13 @@ def register():
         
         if error is None:
             try:
-                db.execute(
-                    'INSERT INTO user (username, password) VALUES (?, ?)',
-                    (username, generate_password_hash(password))
-                )
-                db.commit()
-            except db.IntegrityError:
-                error = f"用户 {username} 已经注册了!"
+                user = get_user_by_username(username)
+                if user is None:
+                    add_user(username, generate_password_hash(password))
+                else:
+                    error = f"用户 {username} 已经注册了!"
+            except e:
+                error = f"出现错误{e}!"
             else:
                 return redirect(url_for('auth.login'))
         flash(error)
@@ -50,20 +50,17 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        db = get_db()
         error = None
-        user = db.execute(
-            'SELECT * FROM user WHERE username = ?', (username,)
-        ).fetchone()
+        user = get_user_by_username(username)
 
         if user is None:
             error = 'Incorrect username.'
-        elif not check_password_hash(user['password'], password):
+        elif not check_password_hash(user.password, password):
             error = 'Incorrect password.'
         
         if error is None:
             session.clear()
-            session['user_id'] = user['id']
+            session['user_id'] = user.id
             return redirect(url_for('index'))
         flash(error)
     return render_template('auth/login.html')
@@ -78,10 +75,7 @@ def load_logged_in_user():
     if user_id is None:
         g.user = None
     else:
-        db = get_db()
-        g.user = db.execute(
-            'SELECT * FROM user WHERE id = ?', (user_id,)
-        ).fetchone()
+        g.user = get_user_by_id(user_id)
 
 @bp.route('/logout')
 def logout():

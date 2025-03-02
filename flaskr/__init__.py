@@ -8,7 +8,9 @@ def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY='dev',
-        DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
+        # DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
+        SQLALCHEMY_DATABASE_URI = f'sqlite:///{app.instance_path}/flaskr.sqlite',  # SQLite 数据库
+        SQLALCHEMY_TRACK_MODIFICATIONS = False
     )
     
     # 加载默认配置
@@ -31,7 +33,7 @@ def create_app(test_config=None):
         return 'Hello, World!'
     
 
-    from . import db
+    from .models import db
     db.init_app(app)
 
     # 使用 app.register_blueprint() 导入并注册 蓝图。新的代码放在工厂函数的尾部返回应用之前。
