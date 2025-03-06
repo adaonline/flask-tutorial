@@ -2,8 +2,10 @@
 
 {% block header %}
   <h1>{{ post['title'] }}</h1>
-  {% if g.user['id'] == post['author_id'] %}
-    <a class="action" href="{{ url_for('blog.update', id=post['id']) }}">编辑</a>
+  {% if g.user %}
+    {% if g.user['id'] == post['author_id'] %}
+      <a class="action" href="{{ url_for('blog.update', id=post['id']) }}">编辑</a>
+    {% endif %}
   {% endif %}
 {% endblock %}
 

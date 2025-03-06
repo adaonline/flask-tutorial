@@ -75,5 +75,7 @@ def delete(id):
 
 @bp.route('/<int:id>/detail', methods=('GET',))
 def detail(id):
-    post = get_post(id)
+    post = get_post_by_id(id)
+    if post is None:
+        abort(404, f"Post id {id} doesn't exist.")
     return render_template('blog/detail.html', post=post)

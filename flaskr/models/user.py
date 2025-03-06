@@ -25,3 +25,10 @@ def delete_user(username):
     db.session.commit()
     return True
 
+def change_user_password(username, password):
+    user = get_user_by_username(username)
+    if user is None:
+        return False
+    user.password = password
+    db.session.commit()
+    return True

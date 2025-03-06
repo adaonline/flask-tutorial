@@ -54,7 +54,7 @@ def login():
         user = get_user_by_username(username)
 
         if user is None:
-            error = 'Incorrect username.'
+            error = 'Not exist username.'
         elif not check_password_hash(user.password, password):
             error = 'Incorrect password.'
         
@@ -95,3 +95,27 @@ def login_required(view):
             return redirect(url_for('auth.login'))
         return view(**kwargs)
     return wrapped_view
+
+@bp.route('/change_password', methods=('GET', 'POST'))
+@login_required
+def change_password():
+    if request.method == 'POST':
+        username = request.form['username']
+        old_password = request.form['old_password']
+        new_password = request.form['new_password']
+        error = None
+        user = get_user_by_username(username)
+
+        if user is None:
+            return render_template('auth/login.html')
+        elif not check_password_hash(user.password, old_password):
+            error = 'Incorrect password.'
+
+        if error is None:
+            change_user_password(username, generate_password_hash(new_password))
+            session.clear()
+            flash('密码修改成功，请重新登录。')
+            return redirect(url_for('auth.login'))
+        else:
+            flash(error)
+    return render_template('auth/change_password.html')
