@@ -5,6 +5,7 @@ from werkzeug.exceptions import abort
 from flaskr.auth import login_required
 from flaskr.models.post import *
 from flaskr.models.user import *
+from flaskr.models.comment import *
 bp = Blueprint("blog", __name__)
 
 @bp.route('/')
@@ -78,4 +79,22 @@ def detail(id):
     post = get_post_by_id(id)
     if post is None:
         abort(404, f"Post id {id} doesn't exist.")
-    return render_template('blog/detail.html', post=post)
+    comments = get_comments_by_post_id(post.id)
+
+    return render_template('blog/detail.html', post=post, comments=comments)
+
+@bp.route('/<int:post_id>/add_comment', methods=['POST'])
+def add_comment(post_id):
+    if request.method == 'POST':
+        content = request.form.get('content')
+        user_id = request.form.get('user_id')
+
+        new_comment = Comment(
+            content=content,
+            user_id=user_id,
+            post_id=post_id,
+        )
+        db.session.add(new_comment)
+        db.session.commit()
+        
+        return redirect(url_for('blog.detail', id=post_id))

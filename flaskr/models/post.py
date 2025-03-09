@@ -12,6 +12,9 @@ class Post(db.Model):
     dislike = db.Column(db.Integer, default=0)
     comments = db.relationship('Comment', backref='post', lazy=True)
     tags = db.relationship('Tag', secondary='post_tag', backref='related_posts', lazy=True)
+    
+    # 建立与 User 模型的反向引用
+    author = db.relationship('User', backref=db.backref('posts', lazy='dynamic'))
 
 
 def add_post(author_id, title, content):

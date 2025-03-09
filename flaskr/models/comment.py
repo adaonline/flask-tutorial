@@ -7,8 +7,9 @@ class Comment(db.Model):
     content = db.Column(db.String(1000), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False)
-
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    # 添加与 User 模型的关系
+    user = db.relationship('User', backref=db.backref('comments', lazy=True))
 def add_comment(content, user_id, post_id, created_at):
     comment = Comment(content=content, user_id=user_id, post_id=post_id, created_at=created_at)
     db.session.add(comment)

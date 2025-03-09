@@ -1,14 +1,43 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{{ post['title'] }}</h1>
+  <div class="title">
+    <h1>{{ post['title'] }}</h1>
+    <div class="about">来自：{{ post.author.username}} 时间：{{ post.created.strftime('%Y-%m-%d') }}</div>
+  </div>
   {% if g.user %}
     {% if g.user['id'] == post['author_id'] %}
-      <a class="action" href="{{ url_for('blog.update', id=post['id']) }}">编辑</a>
+      <a class="action" href="{{ url_for('blog.update', id=post['id']) }}" style="position: relative; top: -20px; left: 10px;">编辑</a>
     {% endif %}
   {% endif %}
 {% endblock %}
 
 {% block content %}
   <p class="body">{{ post['content'] }}</p>
+
+  <!-- 只有登录用户才能看到评论表单 -->
+  {% if g.user %}
+    <h3>添加评论</h3>
+    <form method="post" action="{{ url_for('blog.add_comment', post_id=post['id']) }}">
+      <label for="content">评论内容:</label><br>
+      <textarea id="content" name="content" rows="4" cols="50" required></textarea><br>
+      <input type="hidden" name="user_id" value="{{ g.user.id }}">
+      <input type="submit" value="提交评论">
+    </form>
+  {% else %}
+    <p>请 <a href="{{ url_for('auth.login') }}">登录</a> 后发表评论。</p>
+  {% endif %}
+  <h3>评论列表</h3>
+  {% if comments %}
+    <ul>
+      {% for comment in comments %}
+        <li>
+          <p>{{ comment['content'] }}</p>
+          <small>评论者: {{ comment.user.username }}, 时间: {{ comment['created_at'] }}</small>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>暂无评论。</p>
+  {% endif %}
 {% endblock %}

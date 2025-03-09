@@ -95,7 +95,7 @@ html {
     color: slategray;
     font-style: italic;
   }
-  
+
   .post .body {
     white-space: pre-line;
   }
@@ -131,4 +131,9 @@ html {
   input[type=submit] {
     align-self: start;
     min-width: 10em;
+  }
+
+  .title .about {
+    color: slategray;
+    font-style: italic;
   }

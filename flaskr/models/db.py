@@ -5,7 +5,8 @@ db = SQLAlchemy()
 import logging
 
 def init_app(app):
-    print("init_app")
+    # 设置 SQLALCHEMY_ECHO 为 True，开启 SQL 语句输出
+    app.config['SQLALCHEMY_ECHO'] = True
     db.init_app(app)
     with app.app_context():
         try:
